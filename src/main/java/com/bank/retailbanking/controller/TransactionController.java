@@ -24,6 +24,7 @@ import com.bank.retailbanking.dto.TransactionSummaryResponsedto;
 import com.bank.retailbanking.exception.AmountInvalidException;
 import com.bank.retailbanking.exception.CustomerNotFoundException;
 import com.bank.retailbanking.exception.GeneralException;
+import com.bank.retailbanking.exception.MortgageException;
 import com.bank.retailbanking.exception.SameAccountNumberException;
 import com.bank.retailbanking.exception.TransactionException;
 import com.bank.retailbanking.service.TransactionService;
@@ -56,12 +57,13 @@ public class TransactionController {
 	 * @throws CustomerNotFoundException
 	 * @throws AmountInvalidException
 	 * @throws SameAccountNumberException
+	 * @throws MortgageException 
 	 */
 
 	@PostMapping
 	public ResponseEntity<Optional<FundTransferResponseDto>> fundTransfer(
 			@RequestBody FundTransferRequestDto fundTransferRequestDto)
-			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException {
+			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException, MortgageException {
 		Optional<FundTransferResponseDto> response = transactionService.fundTransfer(fundTransferRequestDto);
 		if (response.isPresent()) {
 			log.info("Transaction is successfull");
@@ -99,11 +101,14 @@ public class TransactionController {
 	 * @param customerId
 	 * @return
 	 * @throws GeneralException
+	 * @throws SameAccountNumberException 
+	 * @throws AmountInvalidException 
+	 * @throws CustomerNotFoundException 
 	 */
 
 	@GetMapping("/customer/{customerId}")
 	public ResponseEntity<MortgageAccountSummaryResponsedto> getAccountSummaryMortgage(@PathVariable Long customerId)
-			throws GeneralException {
+			throws GeneralException, CustomerNotFoundException, AmountInvalidException, SameAccountNumberException {
 		log.info("Entering into getAccountSummary method of LoginController");
 		MortgageAccountSummaryResponsedto mortgageAccountSummaryResponsedto = transactionService.getAccountSummary(customerId);
 		mortgageAccountSummaryResponsedto.setMessage(ApplicationConstants.SUCCESS);

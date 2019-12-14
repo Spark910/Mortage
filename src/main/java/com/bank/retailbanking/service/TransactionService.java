@@ -11,6 +11,7 @@ import com.bank.retailbanking.dto.TransactionSummaryResponsedto;
 import com.bank.retailbanking.exception.AmountInvalidException;
 import com.bank.retailbanking.exception.CustomerNotFoundException;
 import com.bank.retailbanking.exception.GeneralException;
+import com.bank.retailbanking.exception.MortgageException;
 import com.bank.retailbanking.exception.SameAccountNumberException;
 import com.bank.retailbanking.exception.TransactionException;
 
@@ -21,11 +22,17 @@ import com.bank.retailbanking.exception.TransactionException;
  * @author maheswraraju
  */
 public interface TransactionService {
-	
-	Optional<TransactionSummaryResponsedto> fetchTransactionsByMonth(Long customerId, String month) throws ParseException, TransactionException;
+
+	Optional<TransactionSummaryResponsedto> fetchTransactionsByMonth(Long customerId, String month)
+			throws ParseException, TransactionException;
+
 	Optional<FundTransferResponseDto> fundTransfer(FundTransferRequestDto fundTransferRequestDto)
-			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException;
-	 MortgageAccountSummaryResponsedto getAccountSummary(Long customerId) throws GeneralException;
+
+			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException, MortgageException;
+
+	public MortgageAccountSummaryResponsedto getAccountSummary(Long customerId)
+			throws GeneralException, CustomerNotFoundException, AmountInvalidException, SameAccountNumberException;
+
 	AccountSummaryResponsedto getAccountSummarys(Long customerId) throws GeneralException;
-	
+
 }

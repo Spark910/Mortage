@@ -22,6 +22,7 @@ import com.bank.retailbanking.dto.FundTransferResponseDto;
 import com.bank.retailbanking.entity.CustomerTransaction;
 import com.bank.retailbanking.exception.AmountInvalidException;
 import com.bank.retailbanking.exception.CustomerNotFoundException;
+import com.bank.retailbanking.exception.MortgageException;
 import com.bank.retailbanking.exception.SameAccountNumberException;
 import com.bank.retailbanking.service.TransactionService;
 
@@ -53,7 +54,7 @@ public class FundTransferControllerTest {
 	}
 
 	@Test
-	public void testFundTransfer() throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException{
+	public void testFundTransfer() throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException, MortgageException{
 		Mockito.when(fundTransferService.fundTransfer(fundTransferRequestDto))
 				.thenReturn(Optional.of(fundTransferResponseDto));
 		ResponseEntity<Optional<FundTransferResponseDto>> response = fundTransferController
@@ -63,7 +64,7 @@ public class FundTransferControllerTest {
 
 	@Test
 	public void testFundTransferFailure() throws CustomerNotFoundException, AmountInvalidException,
-			SameAccountNumberException{
+			SameAccountNumberException, MortgageException{
 		Mockito.when(fundTransferService.fundTransfer(fundTransferRequestDto)).thenReturn(Optional.ofNullable(null));
 		ResponseEntity<Optional<FundTransferResponseDto>> response = fundTransferController
 				.fundTransfer(fundTransferRequestDto);

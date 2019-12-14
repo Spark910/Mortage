@@ -44,6 +44,18 @@ public class GlobalExceptionHandler {
 		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
 		return new ResponseEntity<>(errorResponse, HttpStatus.NOT_ACCEPTABLE);	
 	}
+	
+	@ExceptionHandler(value = NoAccountListException.class)
+	public ResponseEntity<ErrorResponse> handleException(NoAccountListException exception) {
+		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+		return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+	}
+	
+	@ExceptionHandler(value = MortgageException.class)
+	public ResponseEntity<ErrorResponse> handleException(MortgageException exception) {
+		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+		return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+	}
 
 
 }
