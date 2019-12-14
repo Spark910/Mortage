@@ -22,6 +22,7 @@ import com.bank.retailbanking.entity.CustomerAccountDetail;
 import com.bank.retailbanking.entity.CustomerTransaction;
 import com.bank.retailbanking.exception.AmountInvalidException;
 import com.bank.retailbanking.exception.CustomerNotFoundException;
+import com.bank.retailbanking.exception.MortgageException;
 import com.bank.retailbanking.exception.SameAccountNumberException;
 import com.bank.retailbanking.repository.CustomerAccountDetailsRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
@@ -151,7 +152,7 @@ public class FundTransferServiceTest {
 
 	@Test
 	public void testFundTransferSuccess()
-			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException {
+			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException, MortgageException {
 		Mockito.when(customerRepository.findByCustomerId(fundTransferRequestDto1.getCustomerId()))
 				.thenReturn(Optional.of(customer));
 		Mockito.when(customerAccountDetailsRepository.findByCustomerId(customer))
@@ -164,7 +165,7 @@ public class FundTransferServiceTest {
 
 	@Test(expected = SameAccountNumberException.class)
 	public void testFundTransferSameAccountNegative()
-			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException {
+			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException, MortgageException {
 		Mockito.when(customerRepository.findByCustomerId(fundTransferRequestDto.getCustomerId()))
 				.thenReturn(Optional.of(customer));
 		Mockito.when(customerAccountDetailsRepository.findByCustomerId(customer))
@@ -178,7 +179,7 @@ public class FundTransferServiceTest {
 
 	@Test(expected = AmountInvalidException.class)
 	public void testFundInsufficientAmountException()
-			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException {
+			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException, MortgageException {
 		Mockito.when(customerRepository.findByCustomerId(fundTransferRequestDto3.getCustomerId()))
 				.thenReturn(Optional.of(customer));
 		Mockito.when(customerAccountDetailsRepository.findByCustomerId(customer))
@@ -192,7 +193,7 @@ public class FundTransferServiceTest {
 
 	@Test(expected = AmountInvalidException.class)
 	public void testFundInsufficientAmount()
-			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException {
+			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException ,MortgageException{
 		Mockito.when(customerRepository.findByCustomerId(fundTransferRequestDto.getCustomerId()))
 				.thenReturn(Optional.of(customer));
 		Mockito.when(customerAccountDetailsRepository.findByCustomerId(customer))
@@ -206,7 +207,7 @@ public class FundTransferServiceTest {
 
 	@Test(expected = AmountInvalidException.class)
 	public void testFundAmountLessThanMinimumBalance()
-			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException {
+			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException ,MortgageException{
 		Mockito.when(customerRepository.findByCustomerId(fundTransferRequestDto2.getCustomerId()))
 				.thenReturn(Optional.of(customer));
 		Mockito.when(customerAccountDetailsRepository.findByCustomerId(customer))
@@ -220,7 +221,7 @@ public class FundTransferServiceTest {
 
 	@Test(expected = CustomerNotFoundException.class)
 	public void testFundAccountNumberInvalidNegative()
-			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException {
+			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException,MortgageException {
 		Mockito.when(customerRepository.findByCustomerId(fundTransferRequestDto.getCustomerId()))
 				.thenReturn(Optional.of(customer));
 		Mockito.when(customerAccountDetailsRepository.findByCustomerId(customer1))
@@ -234,7 +235,7 @@ public class FundTransferServiceTest {
 
 	@Test(expected = CustomerNotFoundException.class)
 	public void testFundCustomerIdInvalidNegative()
-			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException {
+			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException,MortgageException {
 		Mockito.when(customerRepository.findByCustomerId(1003L)).thenReturn(Optional.of(customer));
 		String message = ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE;
 		Optional<FundTransferResponseDto> expected = fundTransferServiceImpl.fundTransfer(fundTransferRequestDto1);
@@ -243,7 +244,7 @@ public class FundTransferServiceTest {
 
 	@Test(expected = CustomerNotFoundException.class)
 	public void testFundAccountNumberNegative()
-			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException {
+			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException,MortgageException {
 		Mockito.when(customerRepository.findByCustomerId(6L)).thenReturn(Optional.of(customer));
 		Mockito.when(customerAccountDetailsRepository.findByCustomerId(customer))
 				.thenReturn(Optional.of(customerAccountDetails));
@@ -256,7 +257,7 @@ public class FundTransferServiceTest {
 
 	@Test(expected = CustomerNotFoundException.class)
 	public void testFundAccountNumberInvalid()
-			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException {
+			throws CustomerNotFoundException, AmountInvalidException, SameAccountNumberException,MortgageException {
 		Mockito.when(customerRepository.findByCustomerId(1001L)).thenReturn(Optional.of(customer));
 		Mockito.when(customerAccountDetailsRepository.findByCustomerId(customer))
 				.thenReturn(Optional.of(customerAccountDetails));
