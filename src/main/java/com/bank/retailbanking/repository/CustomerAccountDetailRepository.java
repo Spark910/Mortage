@@ -10,9 +10,7 @@ import com.bank.retailbanking.entity.Customer;
 import com.bank.retailbanking.entity.CustomerAccountDetail;
 
 @Repository
-public interface CustomerAccountDetailsRepository extends JpaRepository<CustomerAccountDetail, Long> {
+public interface CustomerAccountDetailRepository extends JpaRepository<CustomerAccountDetail, Long>  {
 
-	Optional<CustomerAccountDetail> findByCustomerId(Customer customer);
-
-	Optional<CustomerAccountDetail> findByAccountNumber(Long accountNumber);
+	List<CustomerAccountDetail> findByCustomerId(Customer customer);
 }

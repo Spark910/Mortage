@@ -19,6 +19,7 @@ import com.bank.retailbanking.constants.ApplicationConstants;
 import com.bank.retailbanking.dto.AccountSummaryResponsedto;
 import com.bank.retailbanking.dto.FundTransferRequestDto;
 import com.bank.retailbanking.dto.FundTransferResponseDto;
+import com.bank.retailbanking.dto.MortgageAccountSummaryResponsedto;
 import com.bank.retailbanking.dto.TransactionSummaryResponsedto;
 import com.bank.retailbanking.exception.AmountInvalidException;
 import com.bank.retailbanking.exception.CustomerNotFoundException;
@@ -106,11 +107,22 @@ public class TransactionController {
 	 * @throws GeneralException
 	 */
 
-	@GetMapping("/{customerId}")
-	public ResponseEntity<AccountSummaryResponsedto> getAccountSummary(@PathVariable Long customerId)
+	@GetMapping("/customer/{customerId}")
+	public ResponseEntity<MortgageAccountSummaryResponsedto> getAccountSummaryMortgage(@PathVariable Long customerId)
 			throws GeneralException {
 		log.info("Entering into getAccountSummary method of LoginController");
-		AccountSummaryResponsedto accountSummaryResponsedto = transactionService.getAccountSummary(customerId);
+		MortgageAccountSummaryResponsedto mortgageAccountSummaryResponsedto = transactionService.getAccountSummary(customerId);
+		mortgageAccountSummaryResponsedto.setMessage(ApplicationConstants.SUCCESS);
+		mortgageAccountSummaryResponsedto.setStatusCode(HttpStatus.OK.value());
+		return new ResponseEntity<>(mortgageAccountSummaryResponsedto, HttpStatus.OK);
+
+	}
+	
+	@GetMapping("/{customerId}")
+	public ResponseEntity<AccountSummaryResponsedto> getAccountSummarys(@PathVariable Long customerId)
+			throws GeneralException {
+		log.info("Entering into getAccountSummary method of LoginController");
+		AccountSummaryResponsedto accountSummaryResponsedto = transactionService.getAccountSummarys(customerId);
 		accountSummaryResponsedto.setMessage(ApplicationConstants.SUCCESS);
 		accountSummaryResponsedto.setStatusCode(HttpStatus.OK.value());
 		return new ResponseEntity<>(accountSummaryResponsedto, HttpStatus.OK);
