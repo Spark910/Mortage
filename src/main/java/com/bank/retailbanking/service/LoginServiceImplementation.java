@@ -52,7 +52,18 @@ public class LoginServiceImplementation implements LoginService {
 		if(!customerResponse.isPresent()) {
 			throw new  GeneralException("Invalid Credentials");
 		}
-		Optional<CustomerAccountDetail> loginResponse = customerAccountDetailsRepository.findByCustomerIdAndPasswordAndAccountType(customerResponse.get(),loginRequestdto.getPassword(),loginRequestdto.getAccountType());
+		
+		String pasword=loginRequestdto.getPassword();
+				
+				
+				
+				
+		String decriptedPassword=pasword.toString();
+
+				
+				
+				
+		Optional<CustomerAccountDetail> loginResponse = customerAccountDetailsRepository.findByCustomerIdAndPasswordAndAccountType(customerResponse.get(),decriptedPassword,loginRequestdto.getAccountType());
 		if (!loginResponse.isPresent()) {
 			log.error(ApplicationConstants.LOGIN_ERROR);
 			throw new GeneralException(ApplicationConstants.LOGIN_ERROR);
