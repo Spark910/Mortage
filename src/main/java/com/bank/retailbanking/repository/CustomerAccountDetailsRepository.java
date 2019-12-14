@@ -18,10 +18,16 @@ public interface CustomerAccountDetailsRepository extends JpaRepository<Customer
 
 	Optional<CustomerAccountDetail> findByAccountNumber(Long accountNumber);
 
+
 	@Query("select u from CustomerAccountDetail u WHERE CAST(u.accountNumber AS string) LIKE %:accountNumber%")
 	List<CustomerAccountDetail> findAllByAccountNumber(@Param("accountNumber") String accountNumber);
 
 	Optional<CustomerAccountDetail> findByCustomerIdAndAccountType(Customer customer, String transactionPurpose);
 
 	Optional<CustomerAccountDetail> findByAccountNumber(Customer customer);
+
+	Optional<CustomerAccountDetail> findByCustomerIdAndAccountType(Optional<Customer> customer, String string);
+	Optional<CustomerAccountDetail> findByCustomerIdAndPasswordAndAccountType(Customer customer, String password, String accountType);
+
+
 }

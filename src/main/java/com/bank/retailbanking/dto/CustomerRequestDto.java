@@ -1,14 +1,13 @@
 package com.bank.retailbanking.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-public class LoginRequestdto {
+public class CustomerRequestDto {
+
 	private Long customerId;
-	private String password;
 	private String accountType;
+	
 }

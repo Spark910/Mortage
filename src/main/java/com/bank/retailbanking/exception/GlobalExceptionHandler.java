@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
 	}
 
-@ExceptionHandler(value = AgeException.class)
+	@ExceptionHandler(value = AgeException.class)
 	public ResponseEntity<ErrorResponse> handleException(AgeException exception) {
 		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
 		return new ResponseEntity<>(errorResponse, HttpStatus.NOT_ACCEPTABLE);

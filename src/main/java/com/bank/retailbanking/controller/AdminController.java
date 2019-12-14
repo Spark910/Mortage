@@ -1,5 +1,6 @@
 package com.bank.retailbanking.controller;
 
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bank.retailbanking.constants.ApplicationConstants;
 import com.bank.retailbanking.dto.AccountList;
 import com.bank.retailbanking.dto.AccountSearchResponseDto;
+import com.bank.retailbanking.dto.ViewAccountResponseDto;
 import com.bank.retailbanking.exception.NoAccountListException;
 import com.bank.retailbanking.service.AdminService;
 
@@ -21,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @CrossOrigin(allowedHeaders = { "*", "*/" }, origins = { "*", "*/" })
 @RestController
+
 @RequestMapping("/admin/customers")
 @Slf4j
 public class AdminController {
@@ -41,6 +44,17 @@ public class AdminController {
 		accountSearchResponseDto.setStatusCode(ApplicationConstants.FUND_TRANSFER_SUCCESS_CODE);
 		accountSearchResponseDto.setMessage(ApplicationConstants.ACCOUNT_LIST_SUCCESS_MESSAGE);
 		return new ResponseEntity<>(accountSearchResponseDto, HttpStatus.OK);
+	}
+
+
+	
+	@GetMapping("/customer/{accountNumber}")
+	public ResponseEntity<ViewAccountResponseDto> viewAccountDetails(@PathVariable Long accountNumber){
+		log.info("Entering into viewAccountDetails method of controller" );
+		ViewAccountResponseDto viewAccountResponseDto=adminService.viewAccountDetails(accountNumber);
+		viewAccountResponseDto.setStatusCode(ApplicationConstants.SUCESS_STATUS_CODE);
+		viewAccountResponseDto.setMessage(ApplicationConstants.SUCCESS);
+		return new ResponseEntity<>(viewAccountResponseDto, HttpStatus.OK);
 
 	}
 
