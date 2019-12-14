@@ -16,4 +16,6 @@ public interface CustomerAccountDetailsRepository extends JpaRepository<Customer
 	Optional<CustomerAccountDetail> findByAccountNumber(Long accountNumber);
 
 	Optional<CustomerAccountDetail> findByCustomerIdAndAccountType(Optional<Customer> customer, String string);
+	Optional<CustomerAccountDetail> findByCustomerIdAndPasswordAndAccountType(Customer customer, String password, String accountType);
+
 }

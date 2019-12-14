@@ -52,11 +52,11 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 		log.info("Checking whether any of the accounts have same email id");
 		Optional<Customer> customerExists = customerRepository.findByCustomerEmailAndMobile(
-				registrationRequestDto.getEmail(), registrationRequestDto.getMobileNumber());
+				registrationRequestDto.getCustomerEmail(), registrationRequestDto.getMobile());
 		log.info("No account with same mailId is found");
 		if (!(customerExists.isPresent())) {
 
-			Long number = registrationRequestDto.getMobileNumber();
+			Long number = registrationRequestDto.getMobile();
 			int length = String.valueOf(number).length();
 
 			log.info("Checking whether the customer age is above 18 years");
@@ -79,6 +79,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 						customerAccountDetails.setAccountType(ApplicationConstants.SAVING_ACCOUNT);
 						customerAccountDetails.setAvailableBalance(registrationRequestDto.getAmount());
 						customerAccountDetails.setCustomerId(customerData);
+						customerAccountDetails.setPassword(customerData.getFirstName().substring(0)+random.nextInt(9999));
 						customerAccountDetailsRepository.save(customerAccountDetails);
 
 						RegistrationResponseDto registrationResponseDto = new RegistrationResponseDto();

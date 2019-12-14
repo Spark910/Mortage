@@ -13,9 +13,9 @@ public class RegistrationRequestDto {
 	private String firstName;
 	private String lastName;
 	private String gender;
-	private String email;
+	private String customerEmail;
 	private LocalDate dateOfBirth;
-	private Long mobileNumber;
+	private Long mobile;
 	private Double amount; 
 
 }

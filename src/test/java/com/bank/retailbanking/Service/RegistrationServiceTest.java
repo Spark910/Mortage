@@ -43,12 +43,12 @@ public class RegistrationServiceTest {
 	@Before
 	public void before() {
 		registrationRequestDto = new RegistrationRequestDto();
-		registrationRequestDto.setEmail("bindu@gmail.com");
+		registrationRequestDto.setCustomerEmail("bindu@gmail.com");
 		registrationRequestDto.setDateOfBirth(LocalDate.of(1997, 10, 2));
 		registrationRequestDto.setFirstName("Bind");
 		registrationRequestDto.setLastName("shree");
 		registrationRequestDto.setGender("female");
-		registrationRequestDto.setMobileNumber(2653871738L);
+		registrationRequestDto.setMobile(2653871738L);
 		registrationRequestDto.setAmount(5000.00);
 
 		registrationResponseDto = new RegistrationResponseDto();
@@ -71,8 +71,8 @@ public class RegistrationServiceTest {
 
 		Customer customer = new Customer();
 		customer.setCustomerEmail("bindu@gmail.com");
-		Mockito.when(customerRepository.findByCustomerEmailAndMobile(registrationRequestDto.getEmail(),
-				registrationRequestDto.getMobileNumber())).thenReturn(Optional.of(customer));
+		Mockito.when(customerRepository.findByCustomerEmailAndMobile(registrationRequestDto.getCustomerEmail(),
+				registrationRequestDto.getMobile())).thenReturn(Optional.of(customer));
 		RegistrationResponseDto response = registrationServiceImpl.registerCustomer(registrationRequestDto);
 		assertEquals(HttpStatus.NOT_ACCEPTABLE, response);
 	}
@@ -93,7 +93,7 @@ public class RegistrationServiceTest {
 	public void registerCustomerTestForInvalidMobileNumber()
 			throws GeneralException, AgeException, InvalidRegistrationException {
 		registrationRequestDto.setDateOfBirth(LocalDate.of(1997, 10, 2));
-		registrationRequestDto.setMobileNumber(26538718L);
+		registrationRequestDto.setMobile(26538718L);
 		RegistrationResponseDto response = registrationServiceImpl.registerCustomer(registrationRequestDto);
 		assertEquals(HttpStatus.NOT_ACCEPTABLE, response);
 	}
@@ -101,7 +101,7 @@ public class RegistrationServiceTest {
 	@Test(expected = GeneralException.class)
 	public void registerCustomerTestForInvalidOpeningBalance()
 			throws GeneralException, AgeException, InvalidRegistrationException {
-		registrationRequestDto.setMobileNumber(1234567890L);
+		registrationRequestDto.setMobile(1234567890L);
 		registrationRequestDto.setAmount(500.00);
 		RegistrationResponseDto response = registrationServiceImpl.registerCustomer(registrationRequestDto);
 		assertEquals(HttpStatus.NOT_ACCEPTABLE, response);
