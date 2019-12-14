@@ -23,7 +23,6 @@ public class Customer {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customerIdSequencer")
 	private Long customerId;
 	private String customerEmail;
-	private String password;
 	private String firstName;
 	private String lastName;
 	private LocalDate dateOfBirth;

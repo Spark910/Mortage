@@ -6,12 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.bank.retailbanking.entity.Customer;
-import com.bank.retailbanking.entity.CustomerAccountDetails;
+import com.bank.retailbanking.entity.CustomerAccountDetail;
 
 @Repository
-public interface CustomerAccountDetailsRepository extends JpaRepository<CustomerAccountDetails, Long> {
+public interface CustomerAccountDetailsRepository extends JpaRepository<CustomerAccountDetail, Long> {
 
-	Optional<CustomerAccountDetails> findByCustomerId(Customer customer);
+	Optional<CustomerAccountDetail> findByCustomerId(Customer customer);
 
-	Optional<CustomerAccountDetails> findByAccountNumber(Long accountNumber);
+	Optional<CustomerAccountDetail> findByAccountNumber(Long accountNumber);
 }

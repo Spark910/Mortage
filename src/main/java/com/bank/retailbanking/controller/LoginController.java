@@ -38,9 +38,8 @@ public class LoginController {
 	 * @author Chethana
 	 * @Description This Method is used to login the customer into the retail
 	 *              banking application.
-	 * @param loginRequestdto Eg:{ "customerMail": "c@gmail.com", "pass": "c" }
-	 * @return LoginResponsedto Eg:{ "message": "Success", "statusCode": 200,
-	 *         "customerId": 1001 } on success
+	 * @param loginRequestdto
+	 * @return LoginResponsedto 
 	 * @throws GeneralException on Failure
 	 * 
 	 */

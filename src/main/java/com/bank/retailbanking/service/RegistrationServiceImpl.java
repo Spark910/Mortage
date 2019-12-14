@@ -12,7 +12,7 @@ import com.bank.retailbanking.constants.ApplicationConstants;
 import com.bank.retailbanking.dto.RegistrationRequestDto;
 import com.bank.retailbanking.dto.RegistrationResponseDto;
 import com.bank.retailbanking.entity.Customer;
-import com.bank.retailbanking.entity.CustomerAccountDetails;
+import com.bank.retailbanking.entity.CustomerAccountDetail;
 import com.bank.retailbanking.exception.AgeException;
 import com.bank.retailbanking.exception.GeneralException;
 import com.bank.retailbanking.exception.InvalidRegistrationException;
@@ -70,12 +70,11 @@ public class RegistrationServiceImpl implements RegistrationService {
 					if (registrationRequestDto.getAmount() >= ApplicationConstants.OPENING_BALANCE) {
 
 						Customer customer = new Customer();
-						customer.setPassword(registrationRequestDto.getFirstName().substring(0, 1)
-								+ registrationRequestDto.getLastName().substring(0, 1) + random.nextInt(9999));
+						
 						BeanUtils.copyProperties(registrationRequestDto, customer);
 						Customer customerData = customerRepository.save(customer);
 
-						CustomerAccountDetails customerAccountDetails = new CustomerAccountDetails();
+						CustomerAccountDetail customerAccountDetails = new CustomerAccountDetail();
 						customerAccountDetails.setAccountOpeningDate(LocalDate.now());
 						customerAccountDetails.setAccountType(ApplicationConstants.SAVING_ACCOUNT);
 						customerAccountDetails.setAvailableBalance(registrationRequestDto.getAmount());

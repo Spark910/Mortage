@@ -18,21 +18,21 @@ import com.bank.retailbanking.constants.ApplicationConstants;
 import com.bank.retailbanking.dto.FundTransferRequestDto;
 import com.bank.retailbanking.dto.FundTransferResponseDto;
 import com.bank.retailbanking.entity.Customer;
-import com.bank.retailbanking.entity.CustomerAccountDetails;
-import com.bank.retailbanking.entity.CustomerTransactions;
+import com.bank.retailbanking.entity.CustomerAccountDetail;
+import com.bank.retailbanking.entity.CustomerTransaction;
 import com.bank.retailbanking.exception.AmountInvalidException;
 import com.bank.retailbanking.exception.CustomerNotFoundException;
 import com.bank.retailbanking.exception.SameAccountNumberException;
 import com.bank.retailbanking.repository.CustomerAccountDetailsRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
 import com.bank.retailbanking.repository.CustomerTransactionsRepository;
-import com.bank.retailbanking.service.FundTransferServiceImpl;
+import com.bank.retailbanking.service.TransactionServiceImpl;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class FundTransferServiceTest {
 
 	@InjectMocks
-	FundTransferServiceImpl fundTransferServiceImpl;
+	TransactionServiceImpl fundTransferServiceImpl;
 
 	@Mock
 	CustomerTransactionsRepository customerTransactionsRepository;
@@ -46,13 +46,13 @@ public class FundTransferServiceTest {
 	Customer customer = null;
 	Customer customer1 = null;
 	Customer customer2 = null;
-	CustomerAccountDetails customerAccountDetails = null;
-	CustomerAccountDetails customerAccountDetails1 = null;
-	CustomerAccountDetails customerAccountDetails2 = null;
-	CustomerAccountDetails customerAccountDetails3 = null;
-	CustomerAccountDetails customerAccountDetails4 = null;
-	CustomerTransactions customerTransactions = null;
-	CustomerTransactions customerCreditTransactions = null;
+	CustomerAccountDetail customerAccountDetails = null;
+	CustomerAccountDetail customerAccountDetails1 = null;
+	CustomerAccountDetail customerAccountDetails2 = null;
+	CustomerAccountDetail customerAccountDetails3 = null;
+	CustomerAccountDetail customerAccountDetails4 = null;
+	CustomerTransaction customerTransactions = null;
+	CustomerTransaction customerCreditTransactions = null;
 	FundTransferRequestDto fundTransferRequestDto = null;
 	FundTransferRequestDto fundTransferRequestDto1 = null;
 	FundTransferRequestDto fundTransferRequestDto2 = null;
@@ -63,13 +63,13 @@ public class FundTransferServiceTest {
 		customer = new Customer();
 		customer1 = new Customer();
 		customer2 = new Customer();
-		customerAccountDetails = new CustomerAccountDetails();
-		customerAccountDetails1 = new CustomerAccountDetails();
-		customerAccountDetails2 = new CustomerAccountDetails();
-		customerAccountDetails3 = new CustomerAccountDetails();
-		customerAccountDetails4 = new CustomerAccountDetails();
-		customerTransactions = new CustomerTransactions();
-		customerCreditTransactions = new CustomerTransactions();
+		customerAccountDetails = new CustomerAccountDetail();
+		customerAccountDetails1 = new CustomerAccountDetail();
+		customerAccountDetails2 = new CustomerAccountDetail();
+		customerAccountDetails3 = new CustomerAccountDetail();
+		customerAccountDetails4 = new CustomerAccountDetail();
+		customerTransactions = new CustomerTransaction();
+		customerCreditTransactions = new CustomerTransaction();
 
 		customer.setCustomerId(1001L);
 		customer1.setCustomerId(1002L);

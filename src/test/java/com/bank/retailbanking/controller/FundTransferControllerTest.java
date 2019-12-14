@@ -16,26 +16,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.bank.retailbanking.constants.ApplicationConstants;
-import com.bank.retailbanking.controller.FundTransferController;
+import com.bank.retailbanking.controller.TransactionController;
 import com.bank.retailbanking.dto.FundTransferRequestDto;
 import com.bank.retailbanking.dto.FundTransferResponseDto;
-import com.bank.retailbanking.entity.CustomerTransactions;
+import com.bank.retailbanking.entity.CustomerTransaction;
 import com.bank.retailbanking.exception.AmountInvalidException;
 import com.bank.retailbanking.exception.CustomerNotFoundException;
 import com.bank.retailbanking.exception.SameAccountNumberException;
-import com.bank.retailbanking.service.FundTransferService;
+import com.bank.retailbanking.service.TransactionService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class FundTransferControllerTest {
 	@InjectMocks
-	FundTransferController fundTransferController;
+	TransactionController fundTransferController;
 
 	@Mock
-	FundTransferService fundTransferService;
+	TransactionService fundTransferService;
 
 	FundTransferRequestDto fundTransferRequestDto = null;
 	FundTransferResponseDto fundTransferResponseDto = null;
-	CustomerTransactions customerTransactions = null;
+	CustomerTransaction customerTransactions = null;
 
 	@Before
 	public void before() {
@@ -49,7 +49,7 @@ public class FundTransferControllerTest {
 		fundTransferResponseDto.setStatusCode(ApplicationConstants.FUND_TRANSFER_SUCCESS_CODE);
 		fundTransferResponseDto.setStatusMessage(ApplicationConstants.FUND_TRANSFER_SUCCESS_MESSAGE);
 
-		customerTransactions = new CustomerTransactions();
+		customerTransactions = new CustomerTransaction();
 	}
 
 	@Test

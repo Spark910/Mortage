@@ -17,7 +17,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class CustomerTransactions {
+public class CustomerTransaction {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long transactionId;
@@ -25,7 +25,7 @@ public class CustomerTransactions {
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "accountNumber", nullable = false)
-	private CustomerAccountDetails accountNumber;
+	private CustomerAccountDetail accountNumber;
 
 	private Double transactionAmount;
 	private LocalDate transactionDate;
