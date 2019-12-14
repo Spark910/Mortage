@@ -2,7 +2,6 @@ package com.bank.retailbanking.Service;
 
 import java.util.Optional;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +15,9 @@ import com.bank.retailbanking.constants.ApplicationConstants;
 import com.bank.retailbanking.dto.LoginRequestdto;
 import com.bank.retailbanking.dto.LoginResponsedto;
 import com.bank.retailbanking.entity.Customer;
+import com.bank.retailbanking.entity.CustomerAccountDetail;
 import com.bank.retailbanking.exception.GeneralException;
+import com.bank.retailbanking.repository.CustomerAccountDetailsRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
 import com.bank.retailbanking.service.LoginServiceImplementation;
 
@@ -36,10 +37,18 @@ public class LoginServiceTest {
 
 	@Mock
 	CustomerRepository loginRepository;
+	
+	@Mock
+	CustomerAccountDetailsRepository customerAccountDetailsRepository;
 
 	LoginResponsedto loginResponsedto;
 	LoginRequestdto loginRequestdto;
-	Customer customer;
+	
+
+	
+	CustomerAccountDetail customerAccountDetail= new CustomerAccountDetail();
+	Customer customer= new Customer();
+	
 
 	public LoginResponsedto getLoginResponse() {
 		loginResponsedto = new LoginResponsedto();
@@ -55,37 +64,19 @@ public class LoginServiceTest {
 		return loginRequestdto;
 	}
 
-	public Customer getCustomer() {
-		customer = new Customer();
-		customer.setCustomerId(1001L);
-		customer.setCustomerId(10001L);
-		return customer;
-	}
-
+	
 	@Before
 	public void setup() {
 		loginResponsedto = getLoginResponse();
 		loginRequestdto = getLoginRequest();
 	}
 
-	@Test
-	public void testLogin() throws GeneralException {
-		log.info("Entering into loginTest of LoginServiceImplementationTest");
-		loginResponsedto = getLoginResponse();
-		loginRequestdto = getLoginRequest();
-		customer = getCustomer();
-		Mockito.when(loginRepository.findByCustomerIdAndPassword(Mockito.any(), Mockito.anyString()))
-				.thenReturn(Optional.of(customer));
-		Optional<LoginResponsedto> response = loginServiceImplementation.login(loginRequestdto);
-		Assert.assertNotNull(response);
-	}
-
 	@Test(expected = GeneralException.class)
 	public void testLoginNegative() throws Exception {
 		log.info("Entering into testLoginNegative of LoginServiceImplementationTest");
-		Mockito.when(loginRepository.findByCustomerIdAndPassword(Mockito.any(), Mockito.anyString()))
-				.thenReturn(Optional.ofNullable(null));
+		customer.setCustomerId(1L);
+		Mockito.when(loginRepository.findByCustomerId(1L)).thenReturn(Optional.of(customer));
 		loginServiceImplementation.login(loginRequestdto);
 	}
-
+	
 }

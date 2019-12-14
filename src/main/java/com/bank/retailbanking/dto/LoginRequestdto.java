@@ -10,4 +10,5 @@ import lombok.Setter;
 public class LoginRequestdto {
 	private Long customerId;
 	private String password;
+	private String accountType;
 }

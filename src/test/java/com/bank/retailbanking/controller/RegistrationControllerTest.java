@@ -35,12 +35,12 @@ public class RegistrationControllerTest {
 	@Before
 	public void before() {
 		registrationRequestDto = new RegistrationRequestDto();
-		registrationRequestDto.setEmail("bindu@gmail.com");
+		registrationRequestDto.setCustomerEmail("bindu@gmail.com");
 		registrationRequestDto.setDateOfBirth(LocalDate.of(1997, 10, 2));
 		registrationRequestDto.setFirstName("Bind");
 		registrationRequestDto.setLastName("shree");
 		registrationRequestDto.setGender("female");
-		registrationRequestDto.setMobileNumber(2653871738L);
+		registrationRequestDto.setMobile(2653871738L);
 
 		registrationResponseDto = new RegistrationResponseDto();
 		registrationResponseDto.setCustomerId(1878L);

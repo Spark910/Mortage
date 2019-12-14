@@ -9,7 +9,9 @@ import com.bank.retailbanking.constants.ApplicationConstants;
 import com.bank.retailbanking.dto.LoginRequestdto;
 import com.bank.retailbanking.dto.LoginResponsedto;
 import com.bank.retailbanking.entity.Customer;
+import com.bank.retailbanking.entity.CustomerAccountDetail;
 import com.bank.retailbanking.exception.GeneralException;
+import com.bank.retailbanking.repository.CustomerAccountDetailsRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
 
 /**
@@ -33,6 +35,9 @@ public class LoginServiceImplementation implements LoginService {
 
 	@Autowired
 	CustomerRepository customerRepository;
+	
+	@Autowired
+	CustomerAccountDetailsRepository customerAccountDetailsRepository;
 
 	/**
 	 * @Description This method is used for user to login with valid credentials
@@ -43,14 +48,17 @@ public class LoginServiceImplementation implements LoginService {
 
 	public Optional<LoginResponsedto> login(LoginRequestdto loginRequestdto) throws GeneralException {
 		log.info("Entering into LoginServiceImplementation-------login()");
-		Optional<Customer> loginResponse = customerRepository
-				.findByCustomerIdAndPassword(loginRequestdto.getCustomerId(), loginRequestdto.getPassword());
+		Optional<Customer> customerResponse=customerRepository.findByCustomerId(loginRequestdto.getCustomerId());
+		if(!customerResponse.isPresent()) {
+			throw new  GeneralException("Invalid Credentials");
+		}
+		Optional<CustomerAccountDetail> loginResponse = customerAccountDetailsRepository.findByCustomerIdAndPasswordAndAccountType(customerResponse.get(),loginRequestdto.getPassword(),loginRequestdto.getAccountType());
 		if (!loginResponse.isPresent()) {
 			log.error(ApplicationConstants.LOGIN_ERROR);
 			throw new GeneralException(ApplicationConstants.LOGIN_ERROR);
 		}
 		LoginResponsedto response = new LoginResponsedto();
-		response.setCustomerId(loginResponse.get().getCustomerId());
+		response.setCustomerId(customerResponse.get().getCustomerId());
 		return Optional.of(response);
 	}
 
