@@ -94,6 +94,7 @@ public class TransactionServiceImpl implements TransactionService {
 						if (transferAmount < amount && balance > ApplicationConstants.OPENING_BALANCE) {
 							/*
 							 * @Description Gets stored as debit action
+							 * 
 							 */
 							CustomerTransaction customerTransactions = new CustomerTransaction();
 							customerTransactions.setAccountNumber(customerAccountDetails.get());
@@ -164,70 +165,68 @@ public class TransactionServiceImpl implements TransactionService {
 					}
 					log.error(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
 					throw new AmountInvalidException(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
-				} else {
-					Optional<CustomerAccountDetail> customerAccount = customerAccountDetailsRepository
-							.findByCustomerId(customerDetails.get());
-					if (!customerAccount.isPresent()) {
-						throw new SameAccountNumberException("Invalid customer Account number");
-					}
-
-					if ((customerAccount.get().getAccountNumber() != creditAccountDetails.get().getAccountNumber())) {
-						if (customerAccount.isPresent()) {
-							Double amount = customerAccountDetails.get().getAvailableBalance();
-							Double creditedAmount = creditAccountDetails.get().getAvailableBalance();
-							Double transferAmount = fundTransferRequestDto.getAmount();
-							Double balance = amount - transferAmount;
-							if (transferAmount < amount && balance > ApplicationConstants.OPENING_BALANCE) {
-								/*
-								 * @Description Gets stored as debit action savings
-								 */
-								CustomerTransaction customerTransactions = new CustomerTransaction();
-								customerTransactions.setAccountNumber(customerAccountDetails.get());
-								customerTransactions.setTransactionAmount(fundTransferRequestDto.getAmount());
-								customerTransactions
-										.setTransactionComments(fundTransferRequestDto.getTransactionPurpose());
-								customerTransactions.setTransactionDate(LocalDate.now());
-								customerTransactions
-										.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
-								customerTransactions.setTransactionType(ApplicationConstants.TRANSACTION_DEBIT_MESSAGE);
-								BeanUtils.copyProperties(fundTransferRequestDto, customerTransactions);
-								customerTransactionsRepository.save(customerTransactions);
-								Double balanceRemaining = amount - transferAmount;
-								customerAccountDetails.get().setAvailableBalance(balanceRemaining);
-								customerAccountDetailsRepository.save(customerAccountDetails.get());
-								customerTransactionsRepository.save(customerTransactions);
-								/*
-								 * @Description Get stored as credit action savings
-								 */
-								CustomerTransaction customerCreditTransactions = new CustomerTransaction();
-								customerCreditTransactions.setAccountNumber(creditAccountDetails.get());
-								customerCreditTransactions.setTransactionAmount(fundTransferRequestDto.getAmount());
-								customerCreditTransactions
-										.setTransactionComments(customerTransactions.getTransactionComments());
-								customerCreditTransactions
-										.setTransactionDate(customerTransactions.getTransactionDate());
-								customerCreditTransactions
-										.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
-								customerCreditTransactions
-										.setTransactionType(ApplicationConstants.TRANSACTION_CREDIT_MESSAGE);
-								Double finalBalance = creditedAmount + transferAmount;
-								creditAccountDetails.get().setAvailableBalance(finalBalance);
-								customerAccountDetailsRepository.save(creditAccountDetails.get());
-								customerTransactionsRepository.save(customerCreditTransactions);
-								return Optional.of(fundTransferResponseDto);
-							}
-							log.error(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
-							throw new AmountInvalidException(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
-						}
-						log.error(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
-						throw new CustomerNotFoundException(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
-					}
-					log.error(ApplicationConstants.ACCOUNTNUMBER_INVALID_MESSAGE);
-					throw new SameAccountNumberException(ApplicationConstants.ACCOUNTNUMBER_INVALID_MESSAGE);
 				}
+			} else {
+				Optional<CustomerAccountDetail> customerAccount = customerAccountDetailsRepository
+						.findByCustomerId(customerDetails.get());
+				if (!customerAccount.isPresent()) {
+					throw new SameAccountNumberException("Invalid customer Account number");
+				}
+
+				if ((customerAccount.get().getAccountNumber() != creditAccountDetails.get().getAccountNumber())) {
+					if (customerAccount.isPresent()) {
+						Double amount = customerAccount.get().getAvailableBalance();
+						Double creditedAmount = creditAccountDetails.get().getAvailableBalance();
+						Double transferAmount = fundTransferRequestDto.getAmount();
+						Double balance = amount - transferAmount;
+						if (transferAmount < amount && balance > ApplicationConstants.OPENING_BALANCE) {
+							/*
+							 * @Description Gets stored as debit action savings
+							 */
+							CustomerTransaction customerTransactions = new CustomerTransaction();
+							customerTransactions.setAccountNumber(customerAccount.get());
+							customerTransactions.setTransactionAmount(fundTransferRequestDto.getAmount());
+							customerTransactions.setTransactionComments(fundTransferRequestDto.getTransactionPurpose());
+							customerTransactions.setTransactionDate(LocalDate.now());
+							customerTransactions.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
+							customerTransactions.setTransactionType(ApplicationConstants.TRANSACTION_DEBIT_MESSAGE);
+							BeanUtils.copyProperties(fundTransferRequestDto, customerTransactions);
+							customerTransactionsRepository.save(customerTransactions);
+							Double balanceRemaining = amount - transferAmount;
+							customerAccount.get().setAvailableBalance(balanceRemaining);
+							customerAccountDetailsRepository.save(customerAccount.get());
+							customerTransactionsRepository.save(customerTransactions);
+							/*
+							 * @Description Get stored as credit action savings
+							 */
+							CustomerTransaction customerCreditTransactions = new CustomerTransaction();
+							customerCreditTransactions.setAccountNumber(creditAccountDetails.get());
+							customerCreditTransactions.setTransactionAmount(fundTransferRequestDto.getAmount());
+							customerCreditTransactions
+									.setTransactionComments(customerTransactions.getTransactionComments());
+							customerCreditTransactions.setTransactionDate(customerTransactions.getTransactionDate());
+							customerCreditTransactions
+									.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
+							customerCreditTransactions
+									.setTransactionType(ApplicationConstants.TRANSACTION_CREDIT_MESSAGE);
+							Double finalBalance = creditedAmount + transferAmount;
+							creditAccountDetails.get().setAvailableBalance(finalBalance);
+							customerAccountDetailsRepository.save(creditAccountDetails.get());
+							customerTransactionsRepository.save(customerCreditTransactions);
+							return Optional.of(fundTransferResponseDto);
+						}
+						log.error(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
+						throw new AmountInvalidException(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
+					}
+					log.error(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
+					throw new CustomerNotFoundException(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
+				}
+				log.error(ApplicationConstants.ACCOUNTNUMBER_INVALID_MESSAGE);
+				throw new SameAccountNumberException(ApplicationConstants.ACCOUNTNUMBER_INVALID_MESSAGE);
 			}
 		}
-		return Optional.of(fundTransferResponseDto);
+		log.error(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
+		throw new CustomerNotFoundException(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
 	}
 
 	/*
