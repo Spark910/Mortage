@@ -95,15 +95,9 @@ public class TransactionController {
 	}
 
 	/**
-	 * @author Chethana
-	 * @Description This method is used to get the customer account summary which
-	 *              includes account details with latest 5 transactions(If
-	 *              available)
-	 * @param customerId Eg:{1001}
-	 * @return { "message": "Success", "statusCode": 200, "accountNumber": 100001,
-	 *         "accountBalance": 3000, "transactions": [ { "transactionType":
-	 *         "debit", "transactionAmount": 100, "transactionDate": "2019-12-03",
-	 *         "transactionComments": "a", "transactionStatus": "success" }}}
+	 *  @author Bindushree
+	 * @param customerId
+	 * @return
 	 * @throws GeneralException
 	 */
 
@@ -117,6 +111,19 @@ public class TransactionController {
 		return new ResponseEntity<>(mortgageAccountSummaryResponsedto, HttpStatus.OK);
 
 	}
+	
+	/**
+	 * @author Chethana
+	 * @Description This method is used to get the customer account summary which
+	 *              includes account details with latest 5 transactions(If
+	 *              available)
+	 * @param customerId Eg:{1001}
+	 * @return { "message": "Success", "statusCode": 200, "accountNumber": 100001,
+	 *         "accountBalance": 3000, "transactions": [ { "transactionType":
+	 *         "debit", "transactionAmount": 100, "transactionDate": "2019-12-03",
+	 *         "transactionComments": "a", "transactionStatus": "success" }}}
+	 * @throws GeneralException
+	 */
 	
 	@GetMapping("/{customerId}")
 	public ResponseEntity<AccountSummaryResponsedto> getAccountSummarys(@PathVariable Long customerId)
