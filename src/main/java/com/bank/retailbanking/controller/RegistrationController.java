@@ -38,6 +38,7 @@ public class RegistrationController {
 	 * 
 	 * @Description This method is used to register a particular customer.
 	 * 
+	 * @author Bindushree
 	 * @param registrationRequestDto
 	 * @return
 	 * @throws PhoneNumberInvalidException

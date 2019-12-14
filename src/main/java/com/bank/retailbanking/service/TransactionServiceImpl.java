@@ -20,6 +20,8 @@ import com.bank.retailbanking.dto.AccountSummaryResponse;
 import com.bank.retailbanking.dto.AccountSummaryResponsedto;
 import com.bank.retailbanking.dto.FundTransferRequestDto;
 import com.bank.retailbanking.dto.FundTransferResponseDto;
+import com.bank.retailbanking.dto.MortgageAccountSummaryResponse;
+import com.bank.retailbanking.dto.MortgageAccountSummaryResponsedto;
 import com.bank.retailbanking.dto.TransactionSummaryResponsedto;
 import com.bank.retailbanking.entity.Customer;
 import com.bank.retailbanking.entity.CustomerAccountDetail;
@@ -29,6 +31,7 @@ import com.bank.retailbanking.exception.CustomerNotFoundException;
 import com.bank.retailbanking.exception.GeneralException;
 import com.bank.retailbanking.exception.SameAccountNumberException;
 import com.bank.retailbanking.exception.TransactionException;
+import com.bank.retailbanking.repository.CustomerAccountDetailRepository;
 import com.bank.retailbanking.repository.CustomerAccountDetailsRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
 import com.bank.retailbanking.repository.CustomerTransactionsRepository;
@@ -40,7 +43,6 @@ import lombok.extern.slf4j.Slf4j;
  * The {@code TransactionServiceIMPl} class provides implimentation to the
  * specific methods
  * 
- * @author maheswraraju
  */
 
 @Service
@@ -52,10 +54,13 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	CustomerAccountDetailsRepository customerAccountDetailsRepository;
+	
+	@Autowired
+	CustomerAccountDetailRepository customerAccountDetailRepository;
 
 	@Autowired
 	CustomerTransactionsRepository customerTransactionsRepository;
-	
+
 	/*
 	 * Method is used to transfer funds b/w two different savings account
 	 */
@@ -90,10 +95,10 @@ public class TransactionServiceImpl implements TransactionService {
 						customerTransactions.setTransactionDate(LocalDate.now());
 						customerTransactions.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
 						customerTransactions.setTransactionType(ApplicationConstants.TRANSACTION_DEBIT_MESSAGE);
-						
+
 						BeanUtils.copyProperties(fundTransferRequestDto, customerTransactions);
 						customerTransactionsRepository.save(customerTransactions);
-						
+
 						Double balanceRemaining = amount - transferAmount;
 						customerAccountDetails.get().setAvailableBalance(balanceRemaining);
 						customerAccountDetailsRepository.save(customerAccountDetails.get());
@@ -141,11 +146,10 @@ public class TransactionServiceImpl implements TransactionService {
 		throw new CustomerNotFoundException(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
 	}
 
-
 	/*
-	 * this method takes two parameters which are customerId and month and finds
-	 * the specific month number And with the help of customer id and month
-	 * transactions will be fetched
+	 * this method takes two parameters which are customerId and month and finds the
+	 * specific month number And with the help of customer id and month transactions
+	 * will be fetched
 	 */
 	@Override
 	public Optional<TransactionSummaryResponsedto> fetchTransactionsByMonth(Long customerId, String month)
@@ -183,18 +187,47 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 		throw new TransactionException("Invalid Customer ID");
 	}
-	
-	
+
 	/*
+	 * @author Bindushree
 	 * Method enables to get account summary details
 	 */
-	public AccountSummaryResponsedto getAccountSummary(Long customerId) throws GeneralException {
+
+	@Override
+	public MortgageAccountSummaryResponsedto getAccountSummary(Long customerId) throws GeneralException {
+		log.info("Entering into AccountSummaryServiceImplementation--------getAccountSummary() Method");
+		Optional<Customer> customerDetails = customerRepository.findById(customerId);
+		MortgageAccountSummaryResponsedto mortgageAccountSummaryResponsedto = new MortgageAccountSummaryResponsedto();
+		if (!customerDetails.isPresent()) {
+			throw new GeneralException("Invalid customer");
+		}
+		List<CustomerAccountDetail> customerAccountDetails = customerAccountDetailRepository
+				.findByCustomerId(customerDetails.get());
+		
+		List<MortgageAccountSummaryResponse> mortgageAccountSummaryResponses=new ArrayList<>();
+
+			for (CustomerAccountDetail customerAccountDetail : customerAccountDetails) {
+				MortgageAccountSummaryResponse mortgageAccountSummaryResponse=new MortgageAccountSummaryResponse();
+				mortgageAccountSummaryResponse.setAccountBalance(customerAccountDetail.getAvailableBalance());
+				mortgageAccountSummaryResponse.setAccountNumber(customerAccountDetail.getAccountNumber());
+				mortgageAccountSummaryResponse.setAccountType(customerAccountDetail.getAccountType());
+				CustomerTransaction customerTransaction=customerTransactionsRepository.findTop1ByAccountNumberOrderByTransactionDateDesc(customerAccountDetail);
+				LocalDate lastTransactionDate=customerTransaction.getTransactionDate();
+				mortgageAccountSummaryResponse.setLastTransactionDate(lastTransactionDate);
+				mortgageAccountSummaryResponses.add(mortgageAccountSummaryResponse);
+			}
+			mortgageAccountSummaryResponsedto.setAccountDetails(mortgageAccountSummaryResponses);
+			return mortgageAccountSummaryResponsedto;
+		}
+		
+	@Override
+	public AccountSummaryResponsedto getAccountSummarys(Long customerId) throws GeneralException {
 		log.info("Entering into AccountSummaryServiceImplementation--------getAccountSummary() Method");
 		Optional<Customer> customerDetails = customerRepository.findById(customerId);
 		AccountSummaryResponsedto accountSummaryResponsedto = new AccountSummaryResponsedto();
 		if (!customerDetails.isPresent()) {
 			throw new GeneralException("Invalid customer");
-		} 
+		}
 		Optional<CustomerAccountDetail> customerAccountDetails = customerAccountDetailsRepository
 				.findByCustomerId(customerDetails.get());
 		if (!customerAccountDetails.isPresent()) {

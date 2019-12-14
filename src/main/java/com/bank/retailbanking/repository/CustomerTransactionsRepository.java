@@ -14,4 +14,7 @@ public interface CustomerTransactionsRepository extends JpaRepository<CustomerTr
 List<CustomerTransaction> findByAccountNumber(CustomerAccountDetail accountNumber);
 
 List<CustomerTransaction> findByAccountNumber(CustomerAccountDetail customerAccountDetails, Pageable pageable);
+
+
+CustomerTransaction findTop1ByAccountNumberOrderByTransactionDateDesc(CustomerAccountDetail customerAccountDetail);
 }
