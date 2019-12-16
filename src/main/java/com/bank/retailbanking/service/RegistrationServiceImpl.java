@@ -16,7 +16,7 @@ import com.bank.retailbanking.entity.CustomerAccountDetail;
 import com.bank.retailbanking.exception.AgeException;
 import com.bank.retailbanking.exception.GeneralException;
 import com.bank.retailbanking.exception.InvalidRegistrationException;
-import com.bank.retailbanking.repository.CustomerAccountDetailsRepository;
+import com.bank.retailbanking.repository.CustomerAccountDetailRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	CustomerRepository customerRepository;
 
 	@Autowired
-	CustomerAccountDetailsRepository customerAccountDetailsRepository;
+	CustomerAccountDetailRepository customerAccountDetailsRepository;
 
 	Random random = new Random();
 

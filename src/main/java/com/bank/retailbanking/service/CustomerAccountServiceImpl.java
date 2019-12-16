@@ -17,7 +17,7 @@ import com.bank.retailbanking.entity.Customer;
 import com.bank.retailbanking.entity.CustomerAccountDetail;
 import com.bank.retailbanking.entity.CustomerProperty;
 import com.bank.retailbanking.exception.GeneralException;
-import com.bank.retailbanking.repository.CustomerAccountDetailsRepository;
+import com.bank.retailbanking.repository.CustomerAccountDetailRepository;
 import com.bank.retailbanking.repository.CustomerPropertyRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
 import com.bank.retailbanking.util.ApplicationPropertyEncripter;
@@ -29,7 +29,7 @@ public class CustomerAccountServiceImpl implements CustomerAccountService {
 	@Autowired
 	CustomerPropertyRepository customerPropertyRepository;
 	@Autowired
-	CustomerAccountDetailsRepository customerAccountDetailsRepository;
+	CustomerAccountDetailRepository customerAccountDetailsRepository;
 	@Autowired
 	private JavaMailSender javaMailSender;
 	Random random = new Random();
