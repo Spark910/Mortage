@@ -448,4 +448,26 @@ public class TransactionServiceTest {
 		Optional<FundTransferResponseDto> expected = transactionServiceImpl.fundTransfer(fundTransferRequestDto);
 		assertEquals(true, expected.isPresent());
 	}
+
+	@Test(expected = GeneralException.class)
+	public void testGetAccountSummarysNegative() throws GeneralException {
+		Customer customer = new Customer();
+		customer.setCustomerId(1L);
+		Mockito.when(customerRepository.findById(6L)).thenReturn(Optional.of(customer));
+		transactionServiceImpl.getAccountSummary(1L);
+	}
+
+	@Test(expected = GeneralException.class)
+	public void testGetAccountSummarysCustDetailsNegative() throws GeneralException {
+		Customer customer = new Customer();
+		customer.setCustomerId(1L);
+		Customer customer1 = new Customer();
+		customer1.setCustomerId(2L);
+		CustomerAccountDetail customerAccountDetail = new CustomerAccountDetail();
+		customerAccountDetail.setCustomerId(customer);
+		Mockito.when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+		Mockito.when(customerAccountDetailRepository.findByCustomerId(customer1))
+				.thenReturn(Optional.of(customerAccountDetail));
+		transactionServiceImpl.getAccountSummarys(1L);
+	}
 }
