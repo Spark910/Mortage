@@ -14,6 +14,6 @@ public class MortgageAccountSummaryResponse {
 	private Long accountNumber;
 	private Double accountBalance;
 	private String accountType;
-	private LocalDate lastTransactionDate;
+	//private LocalDate lastTransactionDate;
 
 }

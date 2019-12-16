@@ -68,7 +68,7 @@ public class RegistrationController {
 	@PostMapping("/mortgage")
 	public ResponseEntity<Optional<CustomerResponseDto>> createMortgageCustomer(
 			@RequestBody CustomerRequestDto customerRequestDto)
-			throws GeneralException, AgeException, InvalidRegistrationException {
+			throws GeneralException {
 		log.info("Entering into createMortgageCustomer method of account creation ");
 		Optional<CustomerResponseDto> customerResponseDto = customerAccountService
 				.createCustomerAccount(customerRequestDto);

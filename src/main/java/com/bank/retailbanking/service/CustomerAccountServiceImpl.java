@@ -20,7 +20,6 @@ import com.bank.retailbanking.exception.GeneralException;
 import com.bank.retailbanking.repository.CustomerAccountDetailRepository;
 import com.bank.retailbanking.repository.CustomerPropertyRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
-import com.bank.retailbanking.util.ApplicationPropertyEncripter;
 
 @Service
 public class CustomerAccountServiceImpl implements CustomerAccountService {
@@ -37,20 +36,21 @@ public class CustomerAccountServiceImpl implements CustomerAccountService {
 	@Override
 	public Optional<CustomerResponseDto> createCustomerAccount(CustomerRequestDto customerRequestDto)
 			throws GeneralException {
-	
+
 		Optional<Customer> customer = customerRepository.findByCustomerId(customerRequestDto.getCustomerId());
 		if (customer.isPresent()) {
-			Optional<CustomerProperty> customerProperty=customerPropertyRepository.findByCustomerId(customer.get());
-			
-			if(!customerProperty.isPresent()) {
+			Optional<CustomerProperty> customerProperty = customerPropertyRepository.findByCustomerId(customer.get());
+
+			if (!customerProperty.isPresent()) {
 				throw new GeneralException("No Customer property found");
 			}
-			Optional<CustomerAccountDetail> customerAccoundDetailsResponse=customerAccountDetailsRepository.findByCustomerIdAndAccountType(customer,"mortgage");
-			
-			if(customerAccoundDetailsResponse.isPresent()) {
+			Optional<CustomerAccountDetail> customerAccoundDetailsResponse = customerAccountDetailsRepository
+					.findByCustomerIdAndAccountType(customer, "mortgage");
+
+			if (customerAccoundDetailsResponse.isPresent()) {
 				throw new GeneralException("Mortgage account already created");
 			}
-			
+
 			CustomerAccountDetail customerAccountDetail = new CustomerAccountDetail();
 			customerAccountDetail.setAccountOpeningDate(LocalDate.now());
 			customerAccountDetail.setAvailableBalance(customerProperty.get().getPropertyValue());
@@ -58,12 +58,12 @@ public class CustomerAccountServiceImpl implements CustomerAccountService {
 			customerAccountDetail.setCustomerId(customer.get());
 			String password = ((customer.get().getFirstName().substring(0, 1)) + random.nextInt(9999));
 
-			String customerName = customer.get().getFirstName();
-			String customerEncriptedPassword = ApplicationPropertyEncripter.passwordEncripter(password);
-			customerAccountDetail.setPassword(customerEncriptedPassword);
 
+			String customerName = customer.get().getFirstName();
+			customerAccountDetail.setPassword(password);
 			BeanUtils.copyProperties(customerRequestDto, customerAccountDetail);
-			customerAccountDetailsRepository.save(customerAccountDetail);
+			customerAccountDetail = customerAccountDetailsRepository.save(customerAccountDetail);
+
 			SimpleMailMessage simple = new SimpleMailMessage();
 			simple.setTo(customer.get().getCustomerEmail());
 			simple.setFrom(ApplicationConstants.MORTGAGE_FROM_GMAILID);
@@ -71,7 +71,7 @@ public class CustomerAccountServiceImpl implements CustomerAccountService {
 			simple.setText(ApplicationConstants.MORTGAGE_TEXT_ONE + ApplicationConstants.NEXT_LINE
 					+ ApplicationConstants.MORTGAGE_TEXT_TWO + ApplicationConstants.WHITE_SPACE + customerName
 					+ ApplicationConstants.NEXT_LINE + ApplicationConstants.MORTGAGE_TEXT_THREE
-					+ customerAccountDetail.getAccountNumber() + ApplicationConstants.NEXT_LINE
+					+ customerAccountDetail.getCustomerId().getCustomerId()+ ApplicationConstants.NEXT_LINE
 					+ ApplicationConstants.MORTGAGE_TEXT_FOUR + ApplicationConstants.WHITE_SPACE + password
 					+ ApplicationConstants.WHITE_SPACE + ApplicationConstants.NEXT_LINE
 					+ ApplicationConstants.MORTGAGE_TEXT_FIVE);
