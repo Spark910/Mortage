@@ -2,9 +2,15 @@
 package com.bank.retailbanking.Service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,10 +21,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import com.bank.retailbanking.constants.ApplicationConstants;
 import com.bank.retailbanking.dto.FundTransferRequestDto;
 import com.bank.retailbanking.dto.FundTransferResponseDto;
+import com.bank.retailbanking.dto.MortgageAccountSummaryResponse;
+import com.bank.retailbanking.dto.MortgageAccountSummaryResponsedto;
 import com.bank.retailbanking.entity.Customer;
 import com.bank.retailbanking.entity.CustomerAccountDetail;
 import com.bank.retailbanking.exception.AmountInvalidException;
 import com.bank.retailbanking.exception.CustomerNotFoundException;
+import com.bank.retailbanking.exception.GeneralException;
 import com.bank.retailbanking.exception.MortgageException;
 import com.bank.retailbanking.exception.SameAccountNumberException;
 import com.bank.retailbanking.repository.CustomerAccountDetailRepository;
@@ -40,6 +49,51 @@ public class TransactionServiceTest {
 
 	@Mock
 	CustomerRepository customerRepository;
+
+	Customer customer = null;
+	MortgageAccountSummaryResponsedto mortgageAccountSummaryResponsedto = null;
+	List<CustomerAccountDetail> customerAccountDetails = null;
+	CustomerAccountDetail customerAccountDetail = null;
+	List<MortgageAccountSummaryResponse> mortgageAccountSummaryResponses = null;
+	MortgageAccountSummaryResponse mortgageAccountSummaryResponse = null;
+
+	@Before
+	public void before() {
+		customer = new Customer();
+		mortgageAccountSummaryResponsedto = new MortgageAccountSummaryResponsedto();
+		customerAccountDetails = new ArrayList<>();
+		customerAccountDetail = new CustomerAccountDetail();
+		mortgageAccountSummaryResponses = new ArrayList<>();
+		mortgageAccountSummaryResponse = new MortgageAccountSummaryResponse();
+		customerAccountDetail.setAccountNumber(100002L);
+		customerAccountDetail.setAccountOpeningDate(LocalDate.now());
+		customerAccountDetail.setAccountType(ApplicationConstants.FUND_TRANSFER_ACCOUNT_TYPE);
+		customerAccountDetail.setAvailableBalance(4000.00);
+		customerAccountDetail.setCustomerId(customer);
+		customerAccountDetails.add(customerAccountDetail);
+		mortgageAccountSummaryResponse.setAccountBalance(customerAccountDetail.getAvailableBalance());
+		mortgageAccountSummaryResponse.setAccountNumber(customerAccountDetail.getAccountNumber());
+		mortgageAccountSummaryResponse.setAccountType(customerAccountDetail.getAccountType());
+		mortgageAccountSummaryResponses.add(mortgageAccountSummaryResponse);
+		mortgageAccountSummaryResponsedto.setAccountDetails(mortgageAccountSummaryResponses);
+		customer.setCustomerId(1001L);
+	}
+
+	@Test(expected = GeneralException.class)
+	public void testGetAccountSummaryForNullCustomer() throws GeneralException {
+		Optional<Customer> customer = Optional.ofNullable(null);
+		Mockito.when(customerRepository.findById(1L)).thenReturn(customer);
+		mortgageAccountSummaryResponsedto = transactionServiceImpl.getAccountSummary(1L);
+		assertNull(mortgageAccountSummaryResponsedto);
+	}
+
+	@Test
+	public void testGetAccountSummaryForPositive() throws GeneralException {
+		Mockito.when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+		Mockito.when(customerAccountDetailRepository.findAllByCustomerId(customer)).thenReturn(customerAccountDetails);
+		MortgageAccountSummaryResponsedto response = transactionServiceImpl.getAccountSummary(1L);
+		assertNotNull(response);
+	}
 
 	@Test(expected = CustomerNotFoundException.class)
 	public void testCustomerNotPresent()

@@ -248,10 +248,6 @@ public class TransactionServiceImpl implements TransactionService {
 			mortgageAccountSummaryResponse.setAccountBalance(customerAccountDetail.getAvailableBalance());
 			mortgageAccountSummaryResponse.setAccountNumber(customerAccountDetail.getAccountNumber());
 			mortgageAccountSummaryResponse.setAccountType(customerAccountDetail.getAccountType());
-			CustomerTransaction customerTransaction = customerTransactionsRepository
-					.findTop1ByAccountNumberOrderByTransactionDateDesc(customerAccountDetail);
-			LocalDate lastTransactionDate = customerTransaction.getTransactionDate();
-			mortgageAccountSummaryResponse.setLastTransactionDate(lastTransactionDate);
 			mortgageAccountSummaryResponses.add(mortgageAccountSummaryResponse);
 		}
 		mortgageAccountSummaryResponsedto.setAccountDetails(mortgageAccountSummaryResponses);
