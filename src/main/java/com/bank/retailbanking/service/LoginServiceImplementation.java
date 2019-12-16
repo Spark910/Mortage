@@ -11,7 +11,7 @@ import com.bank.retailbanking.dto.LoginResponsedto;
 import com.bank.retailbanking.entity.Customer;
 import com.bank.retailbanking.entity.CustomerAccountDetail;
 import com.bank.retailbanking.exception.GeneralException;
-import com.bank.retailbanking.repository.CustomerAccountDetailsRepository;
+import com.bank.retailbanking.repository.CustomerAccountDetailRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
 
 /**
@@ -37,7 +37,7 @@ public class LoginServiceImplementation implements LoginService {
 	CustomerRepository customerRepository;
 	
 	@Autowired
-	CustomerAccountDetailsRepository customerAccountDetailsRepository;
+	CustomerAccountDetailRepository customerAccountDetailsRepository;
 
 	/**
 	 * @Description This method is used for user to login with valid credentials

@@ -21,7 +21,7 @@ import com.bank.retailbanking.entity.Customer;
 import com.bank.retailbanking.exception.AgeException;
 import com.bank.retailbanking.exception.GeneralException;
 import com.bank.retailbanking.exception.InvalidRegistrationException;
-import com.bank.retailbanking.repository.CustomerAccountDetailsRepository;
+import com.bank.retailbanking.repository.CustomerAccountDetailRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
 import com.bank.retailbanking.service.RegistrationServiceImpl;
 
@@ -32,7 +32,7 @@ public class RegistrationServiceTest {
 	RegistrationServiceImpl registrationServiceImpl;
 
 	@Mock
-	CustomerAccountDetailsRepository customerAccountDetailsRepository;
+	CustomerAccountDetailRepository customerAccountDetailsRepository;
 
 	@Mock
 	CustomerRepository customerRepository;

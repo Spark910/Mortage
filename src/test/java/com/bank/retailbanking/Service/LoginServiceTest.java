@@ -17,7 +17,7 @@ import com.bank.retailbanking.dto.LoginResponsedto;
 import com.bank.retailbanking.entity.Customer;
 import com.bank.retailbanking.entity.CustomerAccountDetail;
 import com.bank.retailbanking.exception.GeneralException;
-import com.bank.retailbanking.repository.CustomerAccountDetailsRepository;
+import com.bank.retailbanking.repository.CustomerAccountDetailRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
 import com.bank.retailbanking.service.LoginServiceImplementation;
 
@@ -39,7 +39,7 @@ public class LoginServiceTest {
 	CustomerRepository loginRepository;
 	
 	@Mock
-	CustomerAccountDetailsRepository customerAccountDetailsRepository;
+	CustomerAccountDetailRepository customerAccountDetailsRepository;
 
 	LoginResponsedto loginResponsedto;
 	LoginRequestdto loginRequestdto;

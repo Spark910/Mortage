@@ -1,6 +1,5 @@
 package com.bank.retailbanking.controller;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +38,7 @@ public class AdminController {
 		if (accountList.isEmpty()) {
 			accountSearchResponseDto.setStatusCode(ApplicationConstants.LIST_FAILURE_CODE);
 			accountSearchResponseDto.setMessage(ApplicationConstants.ACCOUNT_LIST_FAILURE_MESSAGE);
+			return new ResponseEntity<>(accountSearchResponseDto, HttpStatus.NOT_FOUND);
 		}
 		accountSearchResponseDto.setAccountList(accountList);
 		accountSearchResponseDto.setStatusCode(ApplicationConstants.FUND_TRANSFER_SUCCESS_CODE);
@@ -46,16 +46,13 @@ public class AdminController {
 		return new ResponseEntity<>(accountSearchResponseDto, HttpStatus.OK);
 	}
 
-
-	
 	@GetMapping("/customer/{accountNumber}")
-	public ResponseEntity<ViewAccountResponseDto> viewAccountDetails(@PathVariable Long accountNumber){
-		log.info("Entering into viewAccountDetails method of controller" );
-		ViewAccountResponseDto viewAccountResponseDto=adminService.viewAccountDetails(accountNumber);
+	public ResponseEntity<ViewAccountResponseDto> viewAccountDetails(@PathVariable Long accountNumber) {
+		log.info("Entering into viewAccountDetails method of controller");
+		ViewAccountResponseDto viewAccountResponseDto = adminService.viewAccountDetails(accountNumber);
 		viewAccountResponseDto.setStatusCode(ApplicationConstants.SUCESS_STATUS_CODE);
 		viewAccountResponseDto.setMessage(ApplicationConstants.SUCCESS);
 		return new ResponseEntity<>(viewAccountResponseDto, HttpStatus.OK);
-
 	}
 
 }
