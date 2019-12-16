@@ -31,14 +31,14 @@ public class RegistrationControllerTest {
 
 	@Mock
 	RegistrationService registrationService;
-	
+
 	@Mock
-	CustomerAccountService customerAccountService; 
+	CustomerAccountService customerAccountService;
 
 	RegistrationRequestDto registrationRequestDto = null;
 	RegistrationResponseDto registrationResponseDto = null;
-	CustomerRequestDto customerRequestDto=null;
-	CustomerResponseDto customerResponseDto=null;
+	CustomerRequestDto customerRequestDto = null;
+	CustomerResponseDto customerResponseDto = null;
 
 	@Before
 	public void before() {
@@ -55,13 +55,12 @@ public class RegistrationControllerTest {
 		registrationResponseDto.setMessage("success");
 		registrationResponseDto.setPassword("BS4668");
 		registrationResponseDto.setStatusCode(200);
-		
-		
-		customerRequestDto=new CustomerRequestDto();
+
+		customerRequestDto = new CustomerRequestDto();
 		customerRequestDto.setAccountType("mortgage");
 		customerRequestDto.setCustomerId(1001L);
-		
-		customerResponseDto=new CustomerResponseDto();
+
+		customerResponseDto = new CustomerResponseDto();
 		customerResponseDto.setMessage("success");
 		customerResponseDto.setStatusCode(201);
 	}
@@ -73,10 +72,13 @@ public class RegistrationControllerTest {
 				.registerCustomer(registrationRequestDto);
 		Assert.assertNotNull(response);
 	}
+
 	@Test
-	public void createMortgageCustomer() throws GeneralException{
-		Mockito.when(customerAccountService.createCustomerAccount(customerRequestDto)).thenReturn(Optional.of(customerResponseDto));
-		ResponseEntity<Optional<CustomerResponseDto>> response = registrationController.createMortgageCustomer(customerRequestDto);
+	public void createMortgageCustomer() throws GeneralException, AgeException, InvalidRegistrationException {
+		Mockito.when(customerAccountService.createCustomerAccount(customerRequestDto))
+				.thenReturn(Optional.of(customerResponseDto));
+		ResponseEntity<Optional<CustomerResponseDto>> response = registrationController
+				.createMortgageCustomer(customerRequestDto);
 		Assert.assertNotNull(response);
 	}
 }
