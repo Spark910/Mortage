@@ -58,13 +58,6 @@ public class RegistrationServiceTest {
 		registrationResponseDto.setStatusCode(200);
 	}
 
-	@Test
-	public void registerCustomerTestForSuccess() throws GeneralException, AgeException, InvalidRegistrationException {
-		RegistrationResponseDto response = registrationServiceImpl.registerCustomer(registrationRequestDto);
-		assertNotNull(response);
-
-	}
-
 	@Test(expected = InvalidRegistrationException.class)
 	public void registerCustomerTestForInvalidRegistration()
 			throws GeneralException, AgeException, InvalidRegistrationException {

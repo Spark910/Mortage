@@ -70,7 +70,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 					if (registrationRequestDto.getAmount() >= ApplicationConstants.OPENING_BALANCE) {
 
 						Customer customer = new Customer();
-						
+
 						BeanUtils.copyProperties(registrationRequestDto, customer);
 						Customer customerData = customerRepository.save(customer);
 
@@ -79,7 +79,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 						customerAccountDetails.setAccountType(ApplicationConstants.SAVING_ACCOUNT);
 						customerAccountDetails.setAvailableBalance(registrationRequestDto.getAmount());
 						customerAccountDetails.setCustomerId(customerData);
-						customerAccountDetails.setPassword(customerData.getFirstName().substring(0)+random.nextInt(9999));
+						customerAccountDetails
+								.setPassword(customerData.getFirstName().substring(0) + random.nextInt(9999));
 						customerAccountDetailsRepository.save(customerAccountDetails);
 
 						RegistrationResponseDto registrationResponseDto = new RegistrationResponseDto();
