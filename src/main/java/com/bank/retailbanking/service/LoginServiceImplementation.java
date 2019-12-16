@@ -35,7 +35,7 @@ public class LoginServiceImplementation implements LoginService {
 
 	@Autowired
 	CustomerRepository customerRepository;
-	
+
 	@Autowired
 	CustomerAccountDetailsRepository customerAccountDetailsRepository;
 
@@ -48,22 +48,19 @@ public class LoginServiceImplementation implements LoginService {
 
 	public Optional<LoginResponsedto> login(LoginRequestdto loginRequestdto) throws GeneralException {
 		log.info("Entering into LoginServiceImplementation-------login()");
-		Optional<Customer> customerResponse=customerRepository.findByCustomerId(loginRequestdto.getCustomerId());
-		if(!customerResponse.isPresent()) {
-			throw new  GeneralException("Invalid Credentials");
+		Optional<Customer> customerResponse = customerRepository.findByCustomerId(loginRequestdto.getCustomerId());
+		if (!customerResponse.isPresent()) {
+
+			throw new GeneralException("Invalid Credentials");
 		}
 		
-		String pasword=loginRequestdto.getPassword();
-				
-				
-				
-				
-		String decriptedPassword=pasword.toString();
-
-				
-				
-				
-		Optional<CustomerAccountDetail> loginResponse = customerAccountDetailsRepository.findByCustomerIdAndPasswordAndAccountType(customerResponse.get(),decriptedPassword,loginRequestdto.getAccountType());
+		  Optional<CustomerAccountDetail> loginResponse =
+		  customerAccountDetailsRepository
+		  .findByCustomerIdAndPasswordAndAccountType(customerResponse.get(),
+		  loginRequestdto.getPassword(), loginRequestdto.getAccountType());
+		 
+		 
+		 
 		if (!loginResponse.isPresent()) {
 			log.error(ApplicationConstants.LOGIN_ERROR);
 			throw new GeneralException(ApplicationConstants.LOGIN_ERROR);
