@@ -33,7 +33,6 @@ import com.bank.retailbanking.exception.MortgageException;
 import com.bank.retailbanking.exception.SameAccountNumberException;
 import com.bank.retailbanking.exception.TransactionException;
 import com.bank.retailbanking.repository.CustomerAccountDetailRepository;
-import com.bank.retailbanking.repository.CustomerAccountDetailsRepository;
 import com.bank.retailbanking.repository.CustomerRepository;
 import com.bank.retailbanking.repository.CustomerTransactionsRepository;
 import com.bank.retailbanking.util.Month;
@@ -54,9 +53,6 @@ public class TransactionServiceImpl implements TransactionService {
 	CustomerRepository customerRepository;
 
 	@Autowired
-	CustomerAccountDetailsRepository customerAccountDetailsRepository;
-
-	@Autowired
 	CustomerAccountDetailRepository customerAccountDetailRepository;
 
 	@Autowired
@@ -73,45 +69,88 @@ public class TransactionServiceImpl implements TransactionService {
 		Optional<Customer> customerDetails = customerRepository
 				.findByCustomerId(fundTransferRequestDto.getCustomerId());
 		if (customerDetails.isPresent()) {
-			Optional<CustomerAccountDetail> customerAccountDetails = customerAccountDetailsRepository
+			Optional<CustomerAccountDetail> mortgageAccountDetails = customerAccountDetailRepository
 					.findByCustomerIdAndAccountType(customerDetails.get(),
 							fundTransferRequestDto.getTransactionPurpose());
-			Optional<CustomerAccountDetail> creditAccountDetails = customerAccountDetailsRepository
-					.findByAccountNumber(fundTransferRequestDto.getCreditAccount());
-
-			/*
-			 * Mortgage transaction
-			 */
-			if (customerAccountDetails.isPresent()) {
-
-				if (customerAccountDetails.isPresent() && creditAccountDetails.isPresent()) {
-					if (customerAccountDetails.get().getAccountNumber() != creditAccountDetails.get()
-							.getAccountNumber()) {
-						Double amount = customerAccountDetails.get().getAvailableBalance();
+			if (mortgageAccountDetails.isPresent()) {
+				Optional<CustomerAccountDetail> savingsAccountDetails = customerAccountDetailRepository
+						.findByCustomerIdAndAccountType(customerDetails.get(), ApplicationConstants.SAVING_ACCOUNT);
+				if (savingsAccountDetails.isPresent()) {
+					Double amount = savingsAccountDetails.get().getAvailableBalance();
+					Double creditedAmount = mortgageAccountDetails.get().getAvailableBalance();
+					Double transferAmount = fundTransferRequestDto.getAmount();
+					Double balance = amount - transferAmount;
+					if (transferAmount < amount && balance > ApplicationConstants.OPENING_BALANCE) {
+						/*
+						 * * Debit from savings account for mortgage
+						 */
+						CustomerTransaction customerTransactions = new CustomerTransaction();
+						customerTransactions.setAccountNumber(savingsAccountDetails.get());
+						customerTransactions.setTransactionAmount(fundTransferRequestDto.getAmount());
+						customerTransactions.setTransactionComments(fundTransferRequestDto.getTransactionPurpose());
+						customerTransactions.setTransactionDate(LocalDate.now());
+						customerTransactions.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
+						customerTransactions.setTransactionType(ApplicationConstants.TRANSACTION_DEBIT_MESSAGE);
+						BeanUtils.copyProperties(fundTransferRequestDto, customerTransactions);
+						customerTransactionsRepository.save(customerTransactions);
+						Double balanceRemaining = amount - transferAmount;
+						savingsAccountDetails.get().setAvailableBalance(balanceRemaining);
+						customerAccountDetailRepository.save(savingsAccountDetails.get());
+						customerTransactionsRepository.save(customerTransactions);
+						/*
+						 * credit to mortgage account
+						 */
+						CustomerTransaction customerCreditTransactions = new CustomerTransaction();
+						customerCreditTransactions.setAccountNumber(mortgageAccountDetails.get());
+						customerCreditTransactions.setTransactionAmount(fundTransferRequestDto.getAmount());
+						customerCreditTransactions
+								.setTransactionComments(customerTransactions.getTransactionComments());
+						customerCreditTransactions.setTransactionDate(customerTransactions.getTransactionDate());
+						customerCreditTransactions
+								.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
+						customerCreditTransactions.setTransactionType(ApplicationConstants.TRANSACTION_CREDIT_MESSAGE);
+						Double finalBalance = creditedAmount + transferAmount;
+						mortgageAccountDetails.get().setAvailableBalance(finalBalance);
+						customerAccountDetailRepository.save(mortgageAccountDetails.get());
+						customerTransactionsRepository.save(customerCreditTransactions);
+						return Optional.of(fundTransferResponseDto);
+					}
+					log.info("Insufficicent balance");
+					throw new AmountInvalidException(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
+				}
+				log.info("No savings account found");
+				throw new CustomerNotFoundException(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
+			}
+			Optional<CustomerAccountDetail> customerAccount = customerAccountDetailRepository
+					.findByCustomerId(customerDetails.get());
+			if (customerAccount.isPresent()) {
+				Optional<CustomerAccountDetail> creditAccountDetails = customerAccountDetailRepository
+						.findByAccountNumber(fundTransferRequestDto.getCreditAccount());
+				if (creditAccountDetails.isPresent()) {
+					if ((customerAccount.get().getAccountNumber() != creditAccountDetails.get().getAccountNumber())) {
+						Double amount = customerAccount.get().getAvailableBalance();
 						Double creditedAmount = creditAccountDetails.get().getAvailableBalance();
 						Double transferAmount = fundTransferRequestDto.getAmount();
 						Double balance = amount - transferAmount;
 						if (transferAmount < amount && balance > ApplicationConstants.OPENING_BALANCE) {
 							/*
-							 * @Description Gets stored as debit action
+							 * @Description Gets stored as debit action savings
 							 */
 							CustomerTransaction customerTransactions = new CustomerTransaction();
-							customerTransactions.setAccountNumber(customerAccountDetails.get());
+							customerTransactions.setAccountNumber(customerAccount.get());
 							customerTransactions.setTransactionAmount(fundTransferRequestDto.getAmount());
 							customerTransactions.setTransactionComments(fundTransferRequestDto.getTransactionPurpose());
 							customerTransactions.setTransactionDate(LocalDate.now());
 							customerTransactions.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
 							customerTransactions.setTransactionType(ApplicationConstants.TRANSACTION_DEBIT_MESSAGE);
-
 							BeanUtils.copyProperties(fundTransferRequestDto, customerTransactions);
 							customerTransactionsRepository.save(customerTransactions);
-
 							Double balanceRemaining = amount - transferAmount;
-							customerAccountDetails.get().setAvailableBalance(balanceRemaining);
-							customerAccountDetailsRepository.save(customerAccountDetails.get());
+							customerAccount.get().setAvailableBalance(balanceRemaining);
+							customerAccountDetailRepository.save(customerAccount.get());
 							customerTransactionsRepository.save(customerTransactions);
 							/*
-							 * @Description Get stored as credit action
+							 * @Description Gets stored as credit action savings
 							 */
 							CustomerTransaction customerCreditTransactions = new CustomerTransaction();
 							customerCreditTransactions.setAccountNumber(creditAccountDetails.get());
@@ -125,109 +164,24 @@ public class TransactionServiceImpl implements TransactionService {
 									.setTransactionType(ApplicationConstants.TRANSACTION_CREDIT_MESSAGE);
 							Double finalBalance = creditedAmount + transferAmount;
 							creditAccountDetails.get().setAvailableBalance(finalBalance);
-							customerAccountDetailsRepository.save(creditAccountDetails.get());
+							customerAccountDetailRepository.save(creditAccountDetails.get());
 							customerTransactionsRepository.save(customerCreditTransactions);
 							return Optional.of(fundTransferResponseDto);
 						}
-						/*
-						 * @Description Gets executed when the transaction amount is more than the
-						 * balance amount or less than minimum balance
-						 */
-
-						CustomerTransaction customerTransactions = new CustomerTransaction();
-						customerTransactions.setAccountNumber(customerAccountDetails.get());
-						customerTransactions.setTransactionAmount(fundTransferRequestDto.getAmount());
-						customerTransactions.setTransactionComments(fundTransferRequestDto.getTransactionPurpose());
-						customerTransactions.setTransactionDate(LocalDate.now());
-						customerTransactions.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
-						customerTransactions.setTransactionType(ApplicationConstants.TRANSACTION_DEBIT_MESSAGE);
-						BeanUtils.copyProperties(fundTransferRequestDto, customerTransactions);
-						customerTransactionsRepository.save(customerTransactions);
-						Double balanceRemaining = amount - transferAmount;
-						customerAccountDetails.get().setAvailableBalance(balanceRemaining);
-						customerAccountDetailsRepository.save(customerAccountDetails.get());
-						customerTransactionsRepository.save(customerTransactions);
-						CustomerTransaction customerCreditTransactions = new CustomerTransaction();
-						customerCreditTransactions.setAccountNumber(creditAccountDetails.get());
-						customerCreditTransactions.setTransactionAmount(fundTransferRequestDto.getAmount());
-						customerCreditTransactions
-								.setTransactionComments(customerTransactions.getTransactionComments());
-						customerCreditTransactions.setTransactionDate(customerTransactions.getTransactionDate());
-						customerCreditTransactions
-								.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
-						customerCreditTransactions.setTransactionType(ApplicationConstants.TRANSACTION_CREDIT_MESSAGE);
-						Double finalBalance = creditedAmount + transferAmount;
-						creditAccountDetails.get().setAvailableBalance(finalBalance);
-						customerAccountDetailsRepository.save(creditAccountDetails.get());
-						customerTransactionsRepository.save(customerCreditTransactions);
-						return Optional.of(fundTransferResponseDto);
+						log.info("Insufficicent balance");
+						throw new AmountInvalidException(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
 					}
-					log.error(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
-					throw new AmountInvalidException(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
-				} else {
-					Optional<CustomerAccountDetail> customerAccount = customerAccountDetailsRepository
-							.findByCustomerId(customerDetails.get());
-					if (!customerAccount.isPresent()) {
-						throw new SameAccountNumberException("Invalid customer Account number");
-					}
-
-					if ((customerAccount.get().getAccountNumber() != creditAccountDetails.get().getAccountNumber())) {
-						if (customerAccount.isPresent()) {
-							Double amount = customerAccountDetails.get().getAvailableBalance();
-							Double creditedAmount = creditAccountDetails.get().getAvailableBalance();
-							Double transferAmount = fundTransferRequestDto.getAmount();
-							Double balance = amount - transferAmount;
-							if (transferAmount < amount && balance > ApplicationConstants.OPENING_BALANCE) {
-								/*
-								 * @Description Gets stored as debit action savings
-								 */
-								CustomerTransaction customerTransactions = new CustomerTransaction();
-								customerTransactions.setAccountNumber(customerAccountDetails.get());
-								customerTransactions.setTransactionAmount(fundTransferRequestDto.getAmount());
-								customerTransactions
-										.setTransactionComments(fundTransferRequestDto.getTransactionPurpose());
-								customerTransactions.setTransactionDate(LocalDate.now());
-								customerTransactions
-										.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
-								customerTransactions.setTransactionType(ApplicationConstants.TRANSACTION_DEBIT_MESSAGE);
-								BeanUtils.copyProperties(fundTransferRequestDto, customerTransactions);
-								customerTransactionsRepository.save(customerTransactions);
-								Double balanceRemaining = amount - transferAmount;
-								customerAccountDetails.get().setAvailableBalance(balanceRemaining);
-								customerAccountDetailsRepository.save(customerAccountDetails.get());
-								customerTransactionsRepository.save(customerTransactions);
-								/*
-								 * @Description Get stored as credit action savings
-								 */
-								CustomerTransaction customerCreditTransactions = new CustomerTransaction();
-								customerCreditTransactions.setAccountNumber(creditAccountDetails.get());
-								customerCreditTransactions.setTransactionAmount(fundTransferRequestDto.getAmount());
-								customerCreditTransactions
-										.setTransactionComments(customerTransactions.getTransactionComments());
-								customerCreditTransactions
-										.setTransactionDate(customerTransactions.getTransactionDate());
-								customerCreditTransactions
-										.setTransactionStatus(ApplicationConstants.TRANSACTION_SUCCESS_MESSAGE);
-								customerCreditTransactions
-										.setTransactionType(ApplicationConstants.TRANSACTION_CREDIT_MESSAGE);
-								Double finalBalance = creditedAmount + transferAmount;
-								creditAccountDetails.get().setAvailableBalance(finalBalance);
-								customerAccountDetailsRepository.save(creditAccountDetails.get());
-								customerTransactionsRepository.save(customerCreditTransactions);
-								return Optional.of(fundTransferResponseDto);
-							}
-							log.error(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
-							throw new AmountInvalidException(ApplicationConstants.AMOUNT_LESSBALANCE_MESSAGE);
-						}
-						log.error(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
-						throw new CustomerNotFoundException(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
-					}
-					log.error(ApplicationConstants.ACCOUNTNUMBER_INVALID_MESSAGE);
+					log.info("You cannot transfer to your account itself");
 					throw new SameAccountNumberException(ApplicationConstants.ACCOUNTNUMBER_INVALID_MESSAGE);
 				}
+				log.info("No customer found");
+				throw new CustomerNotFoundException(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
 			}
+			log.info("No customer found");
+			throw new CustomerNotFoundException(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
 		}
-		return Optional.of(fundTransferResponseDto);
+		log.info("No customer found");
+		throw new CustomerNotFoundException(ApplicationConstants.CUSTOMER_NOT_FOUND_MESSAGE);
 	}
 
 	/*
@@ -241,7 +195,7 @@ public class TransactionServiceImpl implements TransactionService {
 		log.info("fetch fetchTransactionsByMonth() is called");
 		Optional<Customer> customerDetails = customerRepository.findById(customerId);
 		if (customerDetails.isPresent()) {
-			Optional<CustomerAccountDetail> customerAccountDetails = customerAccountDetailsRepository
+			Optional<CustomerAccountDetail> customerAccountDetails = customerAccountDetailRepository
 					.findByCustomerId(customerDetails.get());
 
 			TransactionSummaryResponsedto accountSummaryResponsedto = new TransactionSummaryResponsedto();
@@ -285,7 +239,7 @@ public class TransactionServiceImpl implements TransactionService {
 			throw new GeneralException("Invalid customer");
 		}
 		List<CustomerAccountDetail> customerAccountDetails = customerAccountDetailRepository
-				.findByCustomerId(customerDetails.get());
+				.findAllByCustomerId(customerDetails.get());
 
 		List<MortgageAccountSummaryResponse> mortgageAccountSummaryResponses = new ArrayList<>();
 
@@ -300,6 +254,7 @@ public class TransactionServiceImpl implements TransactionService {
 			 * LocalDate lastTransactionDate = customerTransaction.getTransactionDate();
 			 * mortgageAccountSummaryResponse.setLastTransactionDate(lastTransactionDate);
 			 */mortgageAccountSummaryResponses.add(mortgageAccountSummaryResponse);
+			mortgageAccountSummaryResponses.add(mortgageAccountSummaryResponse);
 		}
 		mortgageAccountSummaryResponsedto.setAccountDetails(mortgageAccountSummaryResponses);
 		return mortgageAccountSummaryResponsedto;
@@ -313,7 +268,7 @@ public class TransactionServiceImpl implements TransactionService {
 		if (!customerDetails.isPresent()) {
 			throw new GeneralException("Invalid customer");
 		}
-		Optional<CustomerAccountDetail> customerAccountDetails = customerAccountDetailsRepository
+		Optional<CustomerAccountDetail> customerAccountDetails = customerAccountDetailRepository
 				.findByCustomerId(customerDetails.get());
 		if (!customerAccountDetails.isPresent()) {
 			throw new GeneralException("No valid Account is available for the customer");

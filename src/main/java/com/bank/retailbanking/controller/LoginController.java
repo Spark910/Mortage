@@ -49,9 +49,10 @@ public class LoginController {
 		log.info("Entering into login method of LoginController");
 		Optional<LoginResponsedto> loginResponsedto = loginService.login(loginRequestdto);
 		if (!loginResponsedto.isPresent()) {
-			loginResponsedto.get().setMessage(ApplicationConstants.LOGIN_ERROR);
-			loginResponsedto.get().setStatusCode(HttpStatus.NOT_FOUND.value());
-			return new ResponseEntity<>(loginResponsedto, HttpStatus.NOT_FOUND);
+			LoginResponsedto loginResponse= new LoginResponsedto();
+			loginResponse.setMessage(ApplicationConstants.LOGIN_ERROR);
+			loginResponse.setStatusCode(HttpStatus.NOT_FOUND.value());
+			return new ResponseEntity<>(Optional.of(loginResponse), HttpStatus.NOT_FOUND);
 		}
 		loginResponsedto.get().setMessage(ApplicationConstants.SUCCESS);
 		loginResponsedto.get().setStatusCode(HttpStatus.OK.value());

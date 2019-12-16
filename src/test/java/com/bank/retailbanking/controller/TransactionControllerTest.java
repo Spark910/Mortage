@@ -27,7 +27,7 @@ import com.bank.retailbanking.exception.SameAccountNumberException;
 import com.bank.retailbanking.service.TransactionService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class FundTransferControllerTest {
+public class TransactionControllerTest {
 	@InjectMocks
 	TransactionController fundTransferController;
 
